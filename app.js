@@ -33,34 +33,20 @@ app.get('/',(req,res)=>{
 
 app.post('/send',upload.single('files'),(req,res) => {
   if(req.file)
-    emails=fs.readFileSync(path.join(__dirname,req.file.path), "utf8").split('\r\n')
+      emails=fs.readFileSync(path.join(__dirname,req.file.path), "utf8").split('\r\n')
   else emails=req.body.email.split(';')
-  if(type='text') html=false
+  if(req.body.type=='text') html=false
   else html=true
   console.log(req.file)
   console.log(req.body)
-// const output=`
-// <p> You have new contact request</p>
-// <h3> Contact Details<h3>
-// <ul>
-// <li> Name:${req.body.name}</li>
-// <li>Company:${req.body.company}</li>
-// <li>Email:${req.body.email}</li>
-// <li>phone:${req.body.phone}</li>
-// </ul>
-// <h3>Message<h3>
-// ${req.body.message}
 
-
-// `;
-// async..await is not allowed in global scope, must use a wrapper
 async function main(){
 
   let transporter = nodemailer.createTransport({
     service:'Gmail',
     auth: {
-        user: 'sakshicls11@gmail.com', // generated ethereal user
-        pass: process.env.password // generated ethereal password
+        user: process.env.email, 
+        pass: process.env.password
     }
   });
 
