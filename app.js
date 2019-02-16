@@ -28,16 +28,30 @@ app.get('/',(req,res)=>{
 });
 
 app.post('/send',upload.single('files'),(req,res) => {
-  if(req.file)
-      emails=fs.readFileSync(path.join(__dirname,req.file.path), "utf8").split('\r\n')
-  else emails=req.body.email.split(';')
   if(req.body.type=='text') isHtml=false
   else isHtml=true
-  sendMail(emails,req.body.subject, isHtml, req.body.html,req.body.text).then(()=>{
-    return res.render('contact',{msg:'email has been sent'});
-  }).catch(()=>{
-    return res.render('contact',{err:'email fail'});
-  })
+
+  if(req.file)
+      fs.readFile(path.join(__dirname,req.file.path), "utf8",(emails)=>{
+        emails=emails.split('\r\n')
+        sendMail(emails,req.body.subject, isHtml, req.body.html,req.body.text).then(()=>{
+          fs.unlinkSync(path.join(__dirname,req.file.path))
+          return res.render('contact',{msg:'email has been sent'});
+        }).catch(()=>{
+          fs.unlinkSync(path.join(__dirname,req.file.path))
+          return res.render('contact',{err:'email fail'});
+        })
+      })
+  else {
+    emails=req.body.email.split(';')
+    sendMail(emails,req.body.subject, isHtml, req.body.html,req.body.text).then(()=>{
+      return res.render('contact',{msg:'email has been sent'});
+    }).catch(()=>{
+      return res.render('contact',{err:'email fail'});
+    })
+  }
+  
+  
 
 })
 app.listen(3000,() => console.log("server started.."))
