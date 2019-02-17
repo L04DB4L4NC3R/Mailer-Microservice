@@ -32,7 +32,7 @@
           </p>
           <p>
             <label>CSV</label>
-            <input type="file" name="files">
+            <input type="file" name="csv">
           </p>
           <p class="full">
             <label>Subject</label>
@@ -50,6 +50,10 @@
             <input required='true ' type="radio" name="type" value="text"/>Text
             <input required='true ' type="radio" name="type" value="html"/>HTML
           {{!-- </p> --}}
+          <p class="full">
+            <label>Attachment</label>
+            <input type="file" name="attachment" multiple>
+          </p>
           <p class="full">
             <button type=submit>Submit</button>
           </p>

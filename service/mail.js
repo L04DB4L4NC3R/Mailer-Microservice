@@ -1,7 +1,8 @@
 const nodemailer=require('nodemailer');
+const fs=require('fs')
 
 module.exports={
-    sendMail: function (emails,subject, isHtml, html,text){
+    sendMail: function (emails,subject, isHtml, html,text,attachments){
         return new Promise((resolve,reject)=>{
             let transporter = nodemailer.createTransport({
                 service:'Gmail',
@@ -15,18 +16,23 @@ module.exports={
                   to: emails, // list of receivers
                   subject:subject, // Subject line
                   text: isHtml?undefined:text, // plain text body
-                  html:isHtml?html:undefined
+                  html:isHtml?html:undefined,
+                  attachments
               };
             
             
               transporter.sendMail(mailOptions, (error, info) => {
-                  if (error) {
-                      console.log(error)
-                      reject()
-                    //   return res.render('contact',{err:'email fail'});
-                  }
-                  resolve()
-                //   return res.render('contact',{msg:'email has been sent'});
+                    if(attachments.length>0)
+                        attachments.forEach(att => {
+                            fs.unlinkSync(att.path)
+                        });
+                    if (error) {
+                        console.log(error)
+                        return reject()
+                        //   return res.render('contact',{err:'email fail'});
+                    }
+                    resolve()
+                    //   return res.render('contact',{msg:'email has been sent'});
               });
         })
     }
