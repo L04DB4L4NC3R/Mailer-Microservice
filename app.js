@@ -46,7 +46,6 @@ app.post('/send', upload.fields([{ name: 'csv' }, { name: 'attachment' }]), (req
 
 
   console.log(attachment)
-  console.log(path.join(__dirname, req.files.csv[0].path))
   if (req.files && req.files.csv && req.files.csv[0])
     fs.readFile(path.join(__dirname, req.files.csv[0].path), "utf8", (err,emails) => {
       emails = emails.split('\r\n')
@@ -70,4 +69,4 @@ app.post('/send', upload.fields([{ name: 'csv' }, { name: 'attachment' }]), (req
 
 
 })
-app.listen(9000, () => console.log("server started.."))
+app.listen(process.env.PORT, () => console.log("server started.."))
