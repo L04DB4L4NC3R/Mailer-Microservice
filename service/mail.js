@@ -3,6 +3,10 @@ const fs=require('fs')
 
 module.exports={
     sendMail: function (emails,subject, isHtml, html,text,attachments){
+        console.log({
+            user: process.env.email, 
+            pass: process.env.password
+        })
         return new Promise((resolve,reject)=>{
             let transporter = nodemailer.createTransport({
                 service:'Gmail',
