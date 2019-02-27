@@ -1,8 +1,8 @@
 const nodemailer=require('nodemailer');
 const fs=require('fs')
 
-module.exports={
-    sendMail: function (emails,subject, isHtml, html,text,attachments){
+module.exports.sendMail=
+    function (emails,subject, isHtml, html,text,attachments){
         console.log({
             user: process.env.email, 
             pass: process.env.password
@@ -40,4 +40,3 @@ module.exports={
               });
         })
     }
-}

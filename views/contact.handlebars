@@ -34,6 +34,18 @@
             <label>CSV</label>
             <input type="file" name="csv">
           </p>
+          <p  class="full" style="text-align:center">
+            or
+          </p>
+          <p class="full">
+            <label>Event Name</label>
+            <input type="text" name="event">
+          </p>
+          {{!-- <p> --}}
+            <input type="radio" name="part" value="all"/> All Participants
+            <input type="radio" name="part" value="present"/> Present Participants
+            <input type="radio" name="part" value="absent"/> Absent Participants
+          {{!-- </p> --}}
           <p class="full">
             <label>Subject</label>
             <input required='true' type="text" name="subject">

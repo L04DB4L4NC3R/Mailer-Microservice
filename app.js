@@ -9,6 +9,9 @@ require('dotenv').config()
 app = express();
 var { sendMail } = require('./service/mail')
 
+// allPrt=require('./service/hades').getPart('DEVFEST 2019','all')
+
+
 app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
 
@@ -45,19 +48,49 @@ app.post('/send', upload.fields([{ name: 'csv' }, { name: 'attachment' }]), (req
     });
 
 
-  console.log(attachment)
-  if (req.files && req.files.csv && req.files.csv[0])
-    fs.readFile(path.join(__dirname, req.files.csv[0].path), "utf8", (err,emails) => {
-      emails = emails.split('\r\n')
+  console.log(req.body)
+  
+  if(req.body.event&&req.body.part){
+    allowedPartType=['all','present','absent']
+
+    if(!allowedPartType.includes(req.body.part)) 
+      return res.render('contact', { err: 'Invalid participant type' });
+
+    require('./service/hades').getPart(req.body.event,req.body.part)
+    .then((emails)=>{
       sendMail(emails, req.body.subject, isHtml, req.body.html, req.body.text, attachment).then(() => {
-        fs.unlinkSync(path.join(__dirname, req.files.csv[0].path))
         return res.render('contact', { msg: 'email has been sent' });
-      }).catch(() => {
-        fs.unlinkSync(path.join(__dirname, req.files.csv[0].path))
-        return res.render('contact', { err: 'email fail' });
+
       })
+      .catch((err) => {
+        console.log('got error')
+        console.log(err)
+        return res.render('contact', { err: 'email fail' });
+
+      })
+    }).catch((e)=>{
+      return res.render('contact', { err: e });
     })
-  else {
+    return console.log(req.body.event,req.body.part)
+  }
+  
+  else if (req.files && req.files.csv && req.files.csv[0])
+    fs.readFile(path.join(__dirname, req.files.csv[0].path), "utf8", (err,data) => {
+      emails = getEmailFromCSV(data)
+      if(emails.length>0){
+        sendMail(emails, req.body.subject, isHtml, req.body.html, req.body.text, attachment).then(() => {
+          fs.unlinkSync(path.join(__dirname, req.files.csv[0].path))
+          return res.render('contact', { msg: 'email has been sent' });
+        }).catch(() => {
+          fs.unlinkSync(path.join(__dirname, req.files.csv[0].path))
+          return res.render('contact', { err: 'email fail' });
+        })
+      } else{
+        return res.render('contact', { err: 'No mailid found under email/emails field' });
+      }
+    })
+
+  else if(req.body.email){
     emails = req.body.email.split(';')
     sendMail(emails, req.body.subject, isHtml, req.body.html, req.body.text, attachment).then(() => {
       return res.render('contact', { msg: 'email has been sent' });
@@ -65,8 +98,27 @@ app.post('/send', upload.fields([{ name: 'csv' }, { name: 'attachment' }]), (req
       return res.render('contact', { err: 'email fail' });
     })
   }
+  else{
+    return res.render('contact', { err: 'No recipients defined' });
+  }
 
 
 
 })
 app.listen(process.env.PORT, () => console.log("server started.."))
+
+
+function getEmailFromCSV(a){
+  let c=[];
+  a.split(/\r\n|\n|\r/).forEach(e=>c.push(e.split(',')))
+  i=c[0].indexOf("email")
+  console.log(c[0],i)
+  if(i===-1) i=c[0].indexOf("emails")
+  if(i==-1) return []
+  
+  let emails=[];
+  for(let j=1; j<c.length;j++){
+    emails.push(c[j][i])
+  }
+  return emails
+}
