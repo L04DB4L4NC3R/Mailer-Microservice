@@ -10,7 +10,7 @@ module.exports.sendMail=
                 auth: {
                     user: process.env.email, 
                     pass: process.env.password
-                }
+                }       
               });
             
               let mailOptions = {

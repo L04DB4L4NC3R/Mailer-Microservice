@@ -1,7 +1,6 @@
 
 Axios=require('axios');
 
-
 module.exports={
     getPart:  function (event,type) {
         return new Promise(async function(resolve,reject){
