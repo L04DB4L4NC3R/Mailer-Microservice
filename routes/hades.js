@@ -12,7 +12,7 @@ router.post('/', function (req, res) {
                 console.log(err)
                 return res.status(400).json({ success: false });
             })
-        }).catch(() => {
+        }).catch((e) => {
             return res.status(400).json({ success: false, msg: e });
         });
 })

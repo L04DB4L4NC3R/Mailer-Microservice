@@ -3,14 +3,19 @@ var csvjson = require('csvjson');
 var { sendMail } = require('../mailer')
 
 
-router.post('/', function (req, res) {
-    var { csv, subject, template } = req.body
-    if (!csv || !template) res.status(400).json({ success: false, msg: 'Incomplete request' });
-    
-    csv = Buffer.from(req.body.csv, 'base64').toString()
-    json = csvjson.toObject(csv);
+router.post('/', async function (req, res) {
+    var { csv, subject, template, event, part } = req.body
+    if (!(csv || (event && part)) || !template) res.status(400).json({ success: false, msg: 'Incomplete request' });
+
+    if (csv) {
+        csv = Buffer.from(csv, 'base64').toString()
+        json = csvjson.toObject(csv);
+    }
+    else {
+        json = await require('../hades').getPart(event, part)
+    }
     json.forEach(data => {
-        mail=template.replace('${name}',data.name).replace('${email}',data.email)
+        mail = template.replace('${name}', data.name).replace('${email}', data.email)
         sendMail([data.email], subject, true, mail).then(() => {
             return res.json({ success: true });
         }).catch((err) => {
