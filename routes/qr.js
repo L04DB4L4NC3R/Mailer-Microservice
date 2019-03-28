@@ -13,7 +13,10 @@ router.post('/', async function (req, res) {
         json = csvjson.toObject(csv);
     }
     else {
-        json = await require('../hades').getPart(event, part)
+        try {
+            json = await require('../hades').getPart(event, part)
+        }
+        catch (e) { return res.status(400).json({ success: false, msg: e }); }
     }
 
     console.log(json)
