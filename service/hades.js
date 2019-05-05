@@ -8,10 +8,10 @@ module.exports={
                 emails=[]
                 response=await Axios.post(`${process.env.BASEURL}api/v1/simple-projection/project-${type}`, {event})
                 response.data.rs.forEach(element => {
-                    emails.push(element.email)
+                    emails.push({email:element.email,name:element.name})
                 });
                 resolve(emails)
-            } catch(e){
+            } catch(e){ 
                 reject(e.response.data.error)
             }
         })
