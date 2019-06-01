@@ -2,12 +2,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const exphbs = require('express-handlebars');
 const path = require('path');
-let multer = require('multer')
-const fs = require('fs')
-let upload = multer({ dest: 'uploads/' })
-require('dotenv').config()
+const multer = require('multer');
+const fs = require('fs');
+
+const upload = multer({ dest: 'uploads/' });
+require('dotenv').config();
+
 app = express();
-let { sendMail } = require('./service/mail')
+const { sendMail } = require('./service/mail');
 
 // allPrt=require('./service/hades').getPart('DEVFEST 2019','all')
 
@@ -23,102 +25,83 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
-
 app.get('/', (req, res) => {
-
   res.render('contact');
-
-  
 });
 
 app.post('/send', upload.fields([{ name: 'csv' }, { name: 'attachment' }]), (req, res) => {
   // console.log(req.files.csv[0])
-  console.log(req.files)
-  if (req.body.type == 'text') isHtml = false
-  else isHtml = true
+  console.log(req.files);
+  if (req.body.type == 'text') isHtml = false;
+  else isHtml = true;
 
-  let attachment = []
-  if (req.files && req.files.attachment && req.files.attachment.constructor == Array)
-    req.files.attachment.forEach(att => {
+  const attachment = [];
+  if (req.files && req.files.attachment && req.files.attachment.constructor == Array) {
+    req.files.attachment.forEach((att) => {
       attachment.push({
         contentType: att.mimetype,
         path: path.join(__dirname, att.path),
-        filename: att.originalname
-      })
+        filename: att.originalname,
+      });
     });
-
-
-  console.log(req.body)
-  
-  if(req.body.event&&req.body.part){
-    allowedPartType=['all','present','absent']
-
-    if(!allowedPartType.includes(req.body.part)) 
-      return res.render('contact', { err: 'Invalid participant type' });
-
-    require('./service/hades').getPart(req.body.event,req.body.part)
-    .then((emails)=>{
-      sendMail(emails, req.body.subject, isHtml, req.body.html, req.body.text, attachment).then(() => {
-        return res.render('contact', { msg: 'email has been sent' });
-
-      })
-      .catch((err) => {
-        console.log('got error')
-        console.log(err)
-        return res.render('contact', { err: 'email fail' });
-
-      })
-    }).catch((e)=>{
-      return res.render('contact', { err: e });
-    })
-    return console.log(req.body.event,req.body.part)
   }
-  
-  else if (req.files && req.files.csv && req.files.csv[0])
-    fs.readFile(path.join(__dirname, req.files.csv[0].path), "utf8", (err,data) => {
-      emails = getEmailFromCSV(data)
-      if(emails.length>0){
+
+
+  console.log(req.body);
+
+  if (req.body.event && req.body.part) {
+    allowedPartType = ['all', 'present', 'absent'];
+
+    if (!allowedPartType.includes(req.body.part)) { return res.render('contact', { err: 'Invalid participant type' }); }
+
+    require('./service/hades').getPart(req.body.event, req.body.part)
+      .then((emails) => {
+        sendMail(emails, req.body.subject, isHtml, req.body.html, req.body.text, attachment).then(() => res.render('contact', { msg: 'email has been sent' }))
+          .catch((err) => {
+            console.log('got error');
+            console.log(err);
+            return res.render('contact', { err: 'email fail' });
+          });
+      }).catch(e => res.render('contact', { err: e }));
+    return console.log(req.body.event, req.body.part);
+  }
+
+  if (req.files && req.files.csv && req.files.csv[0]) {
+    fs.readFile(path.join(__dirname, req.files.csv[0].path), 'utf8', (err, data) => {
+      emails = getEmailFromCSV(data);
+      if (emails.length > 0) {
         sendMail(emails, req.body.subject, isHtml, req.body.html, req.body.text, attachment).then(() => {
-          fs.unlinkSync(path.join(__dirname, req.files.csv[0].path))
+          fs.unlinkSync(path.join(__dirname, req.files.csv[0].path));
           return res.render('contact', { msg: 'email has been sent' });
         }).catch(() => {
-          fs.unlinkSync(path.join(__dirname, req.files.csv[0].path))
+          fs.unlinkSync(path.join(__dirname, req.files.csv[0].path));
           return res.render('contact', { err: 'email fail' });
-        })
-      } else{
+        });
+      } else {
         return res.render('contact', { err: 'No mailid found under email/emails field' });
       }
-    })
-
-  else if(req.body.email){
-    emails = req.body.email.split(';')
-    sendMail(emails, req.body.subject, isHtml, req.body.html, req.body.text, attachment).then(() => {
-      return res.render('contact', { msg: 'email has been sent' });
-    }).catch(() => {
-      return res.render('contact', { err: 'email fail' });
-    })
-  }
-  else{
+    });
+  } else if (req.body.email) {
+    emails = req.body.email.split(';');
+    sendMail(emails, req.body.subject, isHtml, req.body.html, req.body.text, attachment).then(() => res.render('contact', { msg: 'email has been sent' })).catch(() => res.render('contact', { err: 'email fail' }));
+  } else {
     return res.render('contact', { err: 'No recipients defined' });
   }
-
-
-
-})
-app.listen(process.env.PORT || 3000, () => console.log("server started.."))
+});
+app.listen(process.env.PORT || 3000, () => console.log('server started..'));
 
 
 let getEmailFromCSV = (a) => {
-  let c=[];
-  a.split(/\r\n|\n|\r/).forEach(e=>c.push(e.split(',')))
-  i=c[0].indexOf("email")
-  console.log(c[0],i)
-  if(i===-1) i=c[0].indexOf("emails")
-  if(i==-1) return []
-  
-  let emails=[];
-  for(let j=1; j<c.length;j++){
-    emails.push(c[j][i])
+  const c = [];
+  a.split(/\r\n|\n|\r/).forEach(e => c.push(e.split(',')));
+  i = c[0].indexOf('email');
+  console.log(c[0], i);
+  if (i === -1) i = c[0].indexOf('emails');
+  if (i == -1) return [];
+
+  const emails = [];
+  for (let j = 1; j < c.length; j++) {
+    emails.push(c[j][i]);
   }
-  return emails
-}
+  return emails;
+};
