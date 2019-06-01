@@ -1,11 +1,11 @@
 const router = require("express").Router();
-var QRCode = require('qrcode')
-var fs = require('fs');
-var csvjson = require('csvjson');
-var { sendMail } = require('../mailer')
+let QRCode = require('qrcode')
+let fs = require('fs');
+let csvjson = require('csvjson');
+let { sendMail } = require('../mailer')
 
-router.post('/', async function (req, res) {
-    var { emails, csv, subject, html, txt, event, part } = req.body
+router.post('/', async (req, res) => {
+    let { emails, csv, subject, html, txt, event, part } = req.body
     if (!(emails || csv || (event && part))) res.status(400).json({ success: false, msg: 'Incomplete request' });
     if (emails) {
         json = []
@@ -29,7 +29,7 @@ router.post('/', async function (req, res) {
                 dark: '#fff',
                 light: '#000'
             }
-        }, function (err, url) {
+        },  (err, url) => {
             sendMail([data.email], subject, html, html, txt, [{ href: url }]).then(() => {
                 return res.json({ success: true });
             }).catch((err) => {

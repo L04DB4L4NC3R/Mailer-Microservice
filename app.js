@@ -2,12 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const exphbs = require('express-handlebars');
 const path = require('path');
-var multer = require('multer')
+let multer = require('multer')
 const fs = require('fs')
-var upload = multer({ dest: 'uploads/' })
+let upload = multer({ dest: 'uploads/' })
 require('dotenv').config()
 app = express();
-var { sendMail } = require('./service/mail')
+let { sendMail } = require('./service/mail')
 
 // allPrt=require('./service/hades').getPart('DEVFEST 2019','all')
 
@@ -37,7 +37,7 @@ app.post('/send', upload.fields([{ name: 'csv' }, { name: 'attachment' }]), (req
   if (req.body.type == 'text') isHtml = false
   else isHtml = true
 
-  var attachment = []
+  let attachment = []
   if (req.files && req.files.attachment && req.files.attachment.constructor == Array)
     req.files.attachment.forEach(att => {
       attachment.push({
@@ -108,7 +108,7 @@ app.post('/send', upload.fields([{ name: 'csv' }, { name: 'attachment' }]), (req
 app.listen(process.env.PORT, () => console.log("server started.."))
 
 
-function getEmailFromCSV(a){
+let getEmailFromCSV = (a) => {
   let c=[];
   a.split(/\r\n|\n|\r/).forEach(e=>c.push(e.split(',')))
   i=c[0].indexOf("email")

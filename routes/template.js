@@ -1,10 +1,10 @@
 const router = require("express").Router();
-var csvjson = require('csvjson');
-var { sendMail } = require('../mailer')
+let csvjson = require('csvjson');
+let { sendMail } = require('../mailer')
 
 
-router.post('/', async function (req, res) {
-    var { emails, csv, subject, template, event, part } = req.body
+router.post('/', async (req, res) => {
+    let { emails, csv, subject, template, event, part } = req.body
     if (!(emails || csv || (event && part)) || !template) res.status(400).json({ success: false, msg: 'Incomplete request' });
     if (emails) {
         json = []

@@ -2,8 +2,7 @@
 const nodemailer=require('nodemailer');
 const fs=require('fs')
 
-module.exports.sendMail=
-    function (emails,subject, isHtml, html,text,attachments){
+module.exports.sendMail =  (emails,subject, isHtml, html,text,attachments) => {
         return new Promise((resolve,reject)=>{
             let transporter = nodemailer.createTransport({
                 service:'Gmail',
