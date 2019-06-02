@@ -16,8 +16,7 @@ const { sendMail } = require('./service/mail');
 
 app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
-
-app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('public', express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
