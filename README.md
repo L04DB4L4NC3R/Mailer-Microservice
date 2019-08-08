@@ -1,3 +1,0 @@
-# Mailer-Microservice
-
-
