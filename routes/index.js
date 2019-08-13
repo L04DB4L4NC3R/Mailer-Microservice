@@ -74,7 +74,7 @@ router.get('/', (req, res) => {
  *          "err": "Participant list is empty"
  *      }
  */
-router.post('/sendEmails', [
+router.post('/sendMail', [
     check('eventName').not().isEmpty(),
     check('mailSubject').not().isEmpty(),
     check('mailBody').not().isEmpty().trim().escape(),
@@ -181,7 +181,81 @@ router.post('/sendEmails', [
     }
 });
 
-router.post('/mailer/:customEmail', [
+/**
+ * @api {post} /sendMail/:customEmail
+ * @apiVersion 0.1.0
+ * @apiName SendCustomMail
+ * @apiGroup Admin
+ *
+ * @apiParam {String} mailSubject Subject of the mail to be sent
+ * @apiParam {String} mailBody Body of the mail to be sent
+ * @apiParam {Boolean} isMarkdown Whether the mail body is formatted with markdown
+ * @apiParam {String} customEmail The email of the person to send a mail to
+ *
+ * @apiSuccess {String} status Response status
+ * @apiSuccess {Object} err Errors, if any
+ *
+ * @apiSuccessExample Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "status": "success",
+ *          "err": null
+ *      }
+ *
+ * @apiError ValidationFailed The request body validation check failed
+ * @apiErrorExample Validation-Error-Response:
+ *      HTTP/1.1 422 Unprocessable Entity
+ *      {
+ *          "err": [
+ *              {
+ *                  "msg": "Invalid value",
+ *                  "param": "mailSubject",
+ *                  "location": "body"
+ *              },
+ *              {
+ *                  "msg": "Invalid value",
+ *                  "param": "mailBody",
+ *                  "location": "body"
+ *              }
+ *          ]
+ *      }
+ *
+ * @apiError MailNotSent The mail was not sent due to an error
+ * @apiErrorExample Mail-Error-Response:
+ *      HTTP/1.1 500 Internal Server Error
+ *      {
+ *          "status": "MailNotSent",
+ *          "err": {
+ *              "message": "Bad Request",
+ *              "code": 400,
+ *              "response": {
+ *                  "headers": {
+ *                      "server": "nginx",
+ *                      "date": "Tue, 13 Aug 2019 05:32:53 GMT",
+ *                      "content-type": "application/json",
+ *                      "content-length": "209",
+ *                      "connection": "close",
+ *                      "access-control-allow-origin": "https://sendgrid.api-docs.io",
+ *                      "access-control-allow-methods": "POST",
+ *                      "access-control-allow-headers": "Authorization, Content-Type, On-behalf-of, x-sg-elas-acl",
+ *                      "access-control-max-age": "600",
+ *                      "x-no-cors-reason": "https://sendgrid.com/docs/Classroom/Basics/API/cors.html"
+ *                  },
+ *                  "body": {
+ *                      "errors": [
+ *                          {
+ *                             "message": "The attachment content must be base64 encoded.",
+ *                             "field": "attachments.0.content",
+ *                             "help": "http://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/errors.html#message.attachments.content"
+ *                          }
+ *                      ]
+ *                  }
+ *              }
+ *          }
+ *      }
+ */
+
+router.post('/sendMail/:customEmail', [
     check('mailSubject').not().isEmpty(),
     check('mailBody').not().isEmpty().trim().escape(),
     check('isMarkdown').not().isEmpty().isBoolean(),
@@ -190,7 +264,8 @@ router.post('/mailer/:customEmail', [
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).send({
-            errors: errors.array()
+            status: 'ValidationFailed',
+            err: errors.array()
         });
     } else {
         const {mailSubject, mailBody, isMarkdown,} = req.body;
@@ -225,7 +300,7 @@ router.post('/mailer/:customEmail', [
         } catch (e) {
             console.log(e);
             return res.status(500).send({
-                status: "failure",
+                status: "MailNotSent",
                 err: e
             })
         }
