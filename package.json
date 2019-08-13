@@ -4,7 +4,8 @@
   "description": "A simple QR generator and mailer microservice written in Node.js",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js",
+    "debug": "nodemon app.js"
   },
   "repository": {
     "type": "git",

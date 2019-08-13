@@ -8,7 +8,10 @@ const mail = require('@sendgrid/mail');
 const axios = require('axios');
 const qr = require('qrcode');
 
-const TEST_API_KEY = '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';
+const TEST_API_KEY = process.env.SENDGRID_API_KEY;
+const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
+
+console.log(TEST_API_KEY);
 
 mail.setApiKey(TEST_API_KEY);
 
@@ -38,6 +41,8 @@ router.get('/', (req, res) => {
  * @apiParam {String="male", "female", "both"} gender Target audience gender
  * @apiParam {Boolean} isMarkdown Whether the mail body is formatted with markdown
  * @apiParam {Number} day The event day
+ *
+ * @apiHeader {String} x-access-token A token to authorize use of this endpoint
  *
  * @apiSuccess {String} status Response status
  * @apiSuccess {Object} err Errors, if any
@@ -82,9 +87,11 @@ router.post('/sendMail', [
     check('sendTo').not().isEmpty().isIn(['absent', 'present', 'both']),
     check('gender').not().isEmpty().isIn(['male', 'female', 'both']),
     check('isMarkdown').not().isEmpty().isBoolean(),
-    check('day').not().isEmpty().isInt()
+    check('day').not().isEmpty().isInt(),
+    check('x-access-token').not().isEmpty().isIn([ACCESS_TOKEN])
 ], async (req, res) => {
     const errors = validationResult(req);
+    const accessToken = req.header('x-access-token');
     if (!errors.isEmpty()) {
         return res.status(422).send({
             status: "ValidationFailed",
@@ -194,6 +201,8 @@ router.post('/sendMail', [
  * @apiParam {Boolean} isMarkdown Whether the mail body is formatted with markdown
  * @apiParam {String} customEmail The email of the person to send a mail to
  *
+ * @apiHeader {String} x-access-token A token to authorize use of this endpoint
+ *
  * @apiSuccess {String} status Response status
  * @apiSuccess {Object} err Errors, if any
  *
@@ -262,7 +271,8 @@ router.post('/sendMail/:customEmail', [
     check('mailSubject').not().isEmpty(),
     check('mailBody').not().isEmpty().trim().escape(),
     check('isMarkdown').not().isEmpty().isBoolean(),
-    param('customEmail').not().isEmpty().isEmail()
+    param('customEmail').not().isEmpty().isEmail(),
+    check('x-access-token').not().isEmpty().isIn([ACCESS_TOKEN])
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

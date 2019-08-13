@@ -47,6 +47,19 @@ define({ "api": [
         ]
       }
     },
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>A token to authorize use of this endpoint</p>"
+          }
+        ]
+      }
+    },
     "success": {
       "fields": {
         "Success 200": [
@@ -175,6 +188,19 @@ define({ "api": [
             "optional": false,
             "field": "day",
             "description": "<p>The event day</p>"
+          }
+        ]
+      }
+    },
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>A token to authorize use of this endpoint</p>"
           }
         ]
       }
