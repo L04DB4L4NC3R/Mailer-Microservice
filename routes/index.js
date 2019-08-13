@@ -23,6 +23,57 @@ router.get('/', (req, res) => {
 //     res.status(200).send(converter.makeHtml(req.body.markdown));
 // });
 
+
+/**
+ * @api {post} /sendMail
+ * @apiVersion 0.1.0
+ * @apiName SendMail
+ * @apiGroup Admin
+ *
+ * @apiParam {String} eventName Name of the event
+ * @apiParam {String} mailSubject Subject of the mail to be sent
+ * @apiParam {String} mailBody Body of the mail to be sent
+ * @apiParam {String="absent", "present", "both"} sendTo Target audience
+ * @apiParam {String="male", "female", "both"} gender Target audience gender
+ * @apiParam {Boolean} isMarkdown Whether the mail body is formatted with markdown
+ * @apiParam {Number} day The event day
+ *
+ * @apiSuccess {String} status Response status
+ * @apiSuccess {Object} err Errors, if any
+ *
+ * @apiSuccessExample Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "status": "success",
+ *          "err": null
+ *      }
+ *
+ * @apiError ValidationFailed The request body validation check failed
+ * @apiErrorExample Validation-Error-Response:
+ *      HTTP/1.1 422 Unprocessable Entity
+ *      {
+ *          "err": [
+ *              {
+ *                  "msg": "Invalid value",
+ *                  "param": "mailSubject",
+ *                  "location": "body"
+ *              },
+ *              {
+ *                  "msg": "Invalid value",
+ *                  "param": "mailBody",
+ *                  "location": "body"
+ *              }
+ *          ]
+ *      }
+ *
+ * @apiError ParticipantsEmpty The participants list is empty
+ * @apiErrorExample Participants-Error-Response:
+ *      HTTP/1.1 500 Internal Server Error
+ *      {
+ *          "status": "EmptyParticipants",
+ *          "err": "Participant list is empty"
+ *      }
+ */
 router.post('/sendEmails', [
     check('eventName').not().isEmpty(),
     check('mailSubject').not().isEmpty(),
@@ -35,7 +86,8 @@ router.post('/sendEmails', [
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).send({
-            errors: errors.array()
+            status: "ValidationFailed",
+            err: errors.array()
         });
     } else {
         const {eventName, mailSubject, mailBody, sendTo, gender, isMarkdown, day} = req.body;
@@ -86,7 +138,7 @@ router.post('/sendEmails', [
 
         if (typeof response === 'undefined' || response.rs.length === 0) {
             return res.status(500).send({
-                status: 'failure',
+                status: 'EmptyParticipants',
                 err: 'Participant list is empty'
             });
         } else {
@@ -179,7 +231,6 @@ router.post('/mailer/:customEmail', [
         }
     }
 });
-
 
 
 module.exports = router;
