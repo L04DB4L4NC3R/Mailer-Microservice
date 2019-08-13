@@ -28,7 +28,7 @@ router.get('/', (req, res) => {
  * @api {post} /sendMail
  * @apiVersion 0.1.0
  * @apiName SendMail
- * @apiGroup Admin
+ * @apiGroup Send Mail
  *
  * @apiParam {String} eventName Name of the event
  * @apiParam {String} mailSubject Subject of the mail to be sent
@@ -185,7 +185,7 @@ router.post('/sendMail', [
  * @api {post} /sendMail/:customEmail
  * @apiVersion 0.1.0
  * @apiName SendCustomMail
- * @apiGroup Admin
+ * @apiGroup Send Mail
  *
  * @apiParam {String} mailSubject Subject of the mail to be sent
  * @apiParam {String} mailBody Body of the mail to be sent

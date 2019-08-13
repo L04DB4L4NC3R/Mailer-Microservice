@@ -5,7 +5,7 @@
     "title": "",
     "version": "0.1.0",
     "name": "SendCustomMail",
-    "group": "Admin",
+    "group": "Send_Mail",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -98,7 +98,7 @@
       ]
     },
     "filename": "routes/index.js",
-    "groupTitle": "Admin"
+    "groupTitle": "Send_Mail"
   },
   {
     "type": "post",
@@ -106,7 +106,7 @@
     "title": "",
     "version": "0.1.0",
     "name": "SendMail",
-    "group": "Admin",
+    "group": "Send_Mail",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -230,6 +230,6 @@
       ]
     },
     "filename": "routes/index.js",
-    "groupTitle": "Admin"
+    "groupTitle": "Send_Mail"
   }
 ]
