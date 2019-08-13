@@ -1,4 +1,5 @@
 const express = require('express');
+const md5 = require('md5');
 const router = express.Router();
 const {check, validationResult, param} = require('express-validator');
 const showdown = require('showdown');
@@ -151,7 +152,7 @@ router.post('/sendMail', [
 
         let code;
         try {
-            code = await qr.toDataURL(participant.email);
+            code = await qr.toDataURL(md5(participant.email + eventName));
         } catch (e) {
             console.log(e);
         }
@@ -187,6 +188,7 @@ router.post('/sendMail', [
  * @apiName SendCustomMail
  * @apiGroup Send Mail
  *
+ * @apiParam {String} eventName Name of the event
  * @apiParam {String} mailSubject Subject of the mail to be sent
  * @apiParam {String} mailBody Body of the mail to be sent
  * @apiParam {Boolean} isMarkdown Whether the mail body is formatted with markdown
@@ -256,6 +258,7 @@ router.post('/sendMail', [
  */
 
 router.post('/sendMail/:customEmail', [
+    check('eventName').not().isEmpty(),
     check('mailSubject').not().isEmpty(),
     check('mailBody').not().isEmpty().trim().escape(),
     check('isMarkdown').not().isEmpty().isBoolean(),
@@ -268,11 +271,11 @@ router.post('/sendMail/:customEmail', [
             err: errors.array()
         });
     } else {
-        const {mailSubject, mailBody, isMarkdown,} = req.body;
+        const {mailSubject, mailBody, isMarkdown, eventName} = req.body;
         const {customEmail} = req.params;
         let code;
         try {
-            code = await qr.toDataURL(customEmail);
+            code = await qr.toDataURL(md5(customEmail + eventName));
         } catch (e) {
             console.log(e);
         }

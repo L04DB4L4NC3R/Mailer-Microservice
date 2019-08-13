@@ -13,6 +13,13 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
+            "field": "eventName",
+            "description": "<p>Name of the event</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
             "field": "mailSubject",
             "description": "<p>Subject of the mail to be sent</p>"
           },
