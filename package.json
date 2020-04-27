@@ -28,7 +28,7 @@
     "eslint-config-google": "^0.13.0",
     "eslint-plugin-import": "^2.17.3",
     "expect": "^24.8.0",
-    "mocha": "^5.1.1",
+    "mocha": "^7.1.2",
     "nodemon": "^1.19.1"
   }
 }
